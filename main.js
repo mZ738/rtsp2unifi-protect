@@ -16,7 +16,7 @@ import { checkConfig } from './src/check.js';
 import { createLogger } from './src/logger.js';
 import { MqttMotionInput } from './src/mqtt-motion.js';
 
-const USAGE = `Virtual Onvif Server
+const USAGE = `rtsp2unifi-protect - virtual Onvif camera for RTSP streams
 
 Usage: node main.js [options] <config>
 

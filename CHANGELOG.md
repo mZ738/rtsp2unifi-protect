@@ -1,6 +1,12 @@
 # Changelog
 
-Versions follow [Semantic Versioning](https://semver.org/). Releases are cut with `npm version <major|minor|patch>` and `git push --follow-tags`; the [Release workflow](.github/workflows/release.yml) then runs the tests, publishes the image to `ghcr.io/mz738/onvif-server` and creates the GitHub release.
+Versions follow [Semantic Versioning](https://semver.org/). Releases are cut with `npm version <major|minor|patch>` and `git push --follow-tags`; the [Release workflow](.github/workflows/release.yml) then runs the tests, publishes the image to `ghcr.io/mz738/rtsp2unifi-protect` and creates the GitHub release.
+
+## [2.2.0] - 2026-10-23
+
+### Changed
+
+- **New home and name.** The project moved from the fork `mZ738/onvif-server` to its own repository, `rtsp2unifi-protect`; the package and the container image are renamed accordingly (`ghcr.io/mz738/rtsp2unifi-protect`). Older releases and their images stay in the archived fork. Nothing inside changed: the systemd unit and metric names (`onvif-server`, `onvif_server_*`) and the default MQTT client id are as before, so an existing installation only needs a new remote URL.
 
 ## [2.1.2] - 2026-10-23
 
@@ -40,6 +46,7 @@ First release of this fork. Everything below is on top of davidcoulson/onvif-ser
 - TCP keepalive on forwarded connections; the WS-Discovery `InstanceId` grows with every start; one discovery socket instead of one per probe.
 - `follow-redirects` updated (GHSA-q3jh-wrc6-jgq8, GHSA-8r9p-f939-6h3c).
 
+[2.2.0]: https://github.com/mZ738/rtsp2unifi-protect/releases/tag/v2.2.0
 [2.1.2]: https://github.com/mZ738/onvif-server/releases/tag/v2.1.2
 [2.1.1]: https://github.com/mZ738/onvif-server/releases/tag/v2.1.1
 [2.1.0]: https://github.com/mZ738/onvif-server/releases/tag/v2.1.0
