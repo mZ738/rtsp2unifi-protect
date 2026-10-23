@@ -1,11 +1,11 @@
 # syntax=docker/dockerfile:1
 
-FROM node:24-alpine AS deps
+FROM node:25-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
-FROM node:24-alpine AS test
+FROM node:25-alpine AS test
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
@@ -14,12 +14,12 @@ RUN npm test
 
 # Bake the imported Onvif/OASIS/W3C schemas into the image, so the container
 # starts without internet access (see scripts/vendor-schemas.js).
-FROM node:24-alpine AS schemas
+FROM node:25-alpine AS schemas
 WORKDIR /app
 COPY scripts ./scripts
 RUN node scripts/vendor-schemas.js /app/wsdl/vendor
 
-FROM node:24-alpine AS runtime
+FROM node:25-alpine AS runtime
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
