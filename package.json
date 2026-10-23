@@ -1,7 +1,7 @@
 {
-  "name": "onvif-server",
-  "version": "2.1.2",
-  "description": "Virtual Onvif Server - add support for multichannel Onvif cameras to UniFi Protect",
+  "name": "rtsp2unifi-protect",
+  "version": "2.2.0",
+  "description": "Virtual Onvif camera for any RTSP stream, built for UniFi Protect: audio, motion events from MQTT, metrics, offline start",
   "type": "module",
   "main": "main.js",
   "license": "MIT",

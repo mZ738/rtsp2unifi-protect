@@ -1,13 +1,13 @@
-# Virtual Onvif Server
+# rtsp2unifi-protect
 
-[![CI](https://github.com/mZ738/onvif-server/actions/workflows/ci.yml/badge.svg)](https://github.com/mZ738/onvif-server/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/mZ738/onvif-server?sort=semver)](https://github.com/mZ738/onvif-server/releases)
+[![CI](https://github.com/mZ738/rtsp2unifi-protect/actions/workflows/ci.yml/badge.svg)](https://github.com/mZ738/rtsp2unifi-protect/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/mZ738/onvif-server?sort=semver)](https://github.com/mZ738/rtsp2unifi-protect/releases)
 
 Turns an RTSP stream into a virtual Onvif camera, so NVRs that only accept Onvif devices - UniFi Protect in particular - can record and show it. It also splits multi-channel recorders (Dahua/Hikvision XVRs, multi-lens cameras) into one virtual camera per channel.
 
 The server answers the Onvif requests itself and forwards RTSP and snapshot traffic unchanged to the real source. It implements Onvif Profile S (live streaming) and, optionally, motion events fed from MQTT; there is no PTZ and no authentication.
 
 > [!NOTE]
-> This is a fork of [davidcoulson/onvif-server](https://github.com/davidcoulson/onvif-server), which modernized the original [daniela-hase/onvif-server](https://github.com/daniela-hase/onvif-server) (see [MODERNIZATION.md](MODERNIZATION.md)). What this fork adds is listed [below](#what-this-fork-adds).
+> This project started as a fork of [davidcoulson/onvif-server](https://github.com/davidcoulson/onvif-server), which modernized the original [daniela-hase/onvif-server](https://github.com/daniela-hase/onvif-server) (see [MODERNIZATION.md](MODERNIZATION.md)). It moved to its own repository in October 2026; releases up to 2.1.2 live in the archived fork [mZ738/onvif-server](https://github.com/mZ738/onvif-server). What was added on top of the original is listed [below](#what-this-fork-adds).
 
 ## How it works
 
@@ -39,9 +39,9 @@ camera ──RTSP──▶ go2rtc (recommended) ──RTSP──▶ virtual Onvi
 Requirements: **Node.js 24+**, one free IP address per virtual camera on the NVR's network, and an H.264 source.
 
 ```bash
-git clone https://github.com/mZ738/onvif-server.git
-cd onvif-server
-git checkout v2.1.2             # a release tag; main is the development branch
+git clone https://github.com/mZ738/rtsp2unifi-protect.git
+cd rtsp2unifi-protect
+git checkout v2.2.0             # a release tag; main is the development branch
 npm ci --omit=dev
 npm run vendor-schemas          # store the Onvif schemas locally (needs internet once)
 
@@ -52,7 +52,7 @@ node main.js config.yaml
 
 The virtual cameras then show up for adoption in UniFi Protect as **"Onvif Cardinal"**, or as whatever `manufacturer`/`model` you set per camera. See [Adopting in UniFi Protect](docs/unifi-protect.md).
 
-Releases are listed in [CHANGELOG.md](CHANGELOG.md); each one also publishes a container image, `ghcr.io/mz738/onvif-server` (see [Docker Compose](docs/running.md#docker-compose)).
+Releases are listed in [CHANGELOG.md](CHANGELOG.md); each one also publishes a container image, `ghcr.io/mz738/rtsp2unifi-protect` (see [Docker Compose](docs/running.md#docker-compose)).
 
 To generate a config from a real Onvif camera or recorder instead:
 

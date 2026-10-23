@@ -14,12 +14,12 @@
 # That is fine here - UniFi Protect lives on another machine. If you need host
 # access, add a macvlan shim interface on the host.
 
-name: onvif-server
+name: rtsp2unifi-protect
 
 x-onvif: &onvif
   build: .
-  # Or use the published image instead of building (tags: 2.1.2, 2.1, latest):
-  # image: ghcr.io/mz738/onvif-server:latest
+  # Or use the published image instead of building (tags: 2.2.0, 2.2, latest):
+  # image: ghcr.io/mz738/rtsp2unifi-protect:latest
   restart: unless-stopped
   environment:
     LOG_FORMAT: json

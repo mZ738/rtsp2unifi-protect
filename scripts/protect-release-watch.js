@@ -40,7 +40,7 @@ const lines = (html) => html
     .map((part) => decode(part.replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim())
     .filter(Boolean);
 
-const response = await fetch(FEED_URL, { headers: { 'User-Agent': 'onvif-server-protect-watch (+https://github.com/mZ738/onvif-server)' } });
+const response = await fetch(FEED_URL, { headers: { 'User-Agent': 'rtsp2unifi-protect-watch (+https://github.com/mZ738/rtsp2unifi-protect)' } });
 if (!response.ok) throw new Error(`feed: HTTP ${response.status}`);
 const xml = await response.text();
 

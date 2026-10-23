@@ -40,4 +40,4 @@ jobs:
         with:
           context: .
           push: false
-          tags: onvif-server:ci
+          tags: rtsp2unifi-protect:ci
