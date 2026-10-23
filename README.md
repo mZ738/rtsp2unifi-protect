@@ -6,7 +6,7 @@ Turns any RTSP stream into a virtual Onvif camera, so an NVR that only accepts O
 
 Typical uses:
 
-- **Cameras Protect would not take** - consumer models without Onvif, or with an Onvif implementation Protect rejects (Reolink E1-class baby monitors, for example).
+- **Cameras Protect would not take** - consumer models without Onvif, or with an Onvif implementation Protect rejects.
 - **One source, many consumers** - put [go2rtc](https://github.com/AlexxIT/go2rtc) in front of the camera and feed Protect, home automation and object detection from one session.
 - **Multi-channel recorders** - split a Dahua/Hikvision XVR or a multi-lens camera into one virtual camera per channel.
 - **Motion from your own detector** - let Frigate, Home Assistant or anything else that speaks MQTT decide what counts as motion, and have Protect record on it.
