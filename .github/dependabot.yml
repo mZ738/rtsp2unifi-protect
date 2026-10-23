@@ -22,3 +22,7 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # Only LTS majors of Node (even numbers) are used; major bumps of the base image are done by hand.
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
