@@ -2,6 +2,16 @@
 
 Versions follow [Semantic Versioning](https://semver.org/). Releases are cut with `npm version <major|minor|patch>` and `git push --follow-tags`; the [Release workflow](.github/workflows/release.yml) then runs the tests, publishes the image to `ghcr.io/mz738/rtsp2unifi-protect` and creates the GitHub release.
 
+## [2.2.1] - 2026-10-24
+
+### Security
+
+- The runtime image no longer ships npm, npx, corepack or yarn. The application does not need them (`node main.js` with dependencies installed in the build stage), and the npm bundled with `node:24-alpine` carried four fixable HIGH findings (`brace-expansion` 5.0.9: CVE-2026-102276, CVE-2026-102278; `undici` 6.28.0: CVE-2026-109869, CVE-2026-19534) that the new image scan ([#8](https://github.com/mZ738/rtsp2unifi-protect/pull/8)) reported. Removing the tools fixes the report and shrinks the attack surface; a rebuild alone would not have helped, as Node 24.22.1 still bundles the same versions.
+
+### Changed
+
+- The weekly image scan opens an issue (label `image-scan`) with the Trivy report when it finds fixable HIGH/CRITICAL vulnerabilities, or appends the report to the open one; the job still fails so the owner is mailed.
+
 ## [2.2.0] - 2026-10-23
 
 ### Changed

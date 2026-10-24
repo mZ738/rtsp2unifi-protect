@@ -2,8 +2,9 @@ name: Image scan
 
 # Weekly: scan the published `latest` image with Trivy. New CVEs appear after a release
 # without any change in this repository, so the release-time scan alone is not enough.
-# The job fails on fixable HIGH/CRITICAL findings; GitHub mails the failure to the owner.
-# Fix: bump the base image / dependencies and cut a new release.
+# On fixable HIGH/CRITICAL findings the job opens an issue (label `image-scan`) with the
+# report, or adds the report to the open one, and fails so GitHub also mails the owner.
+# Fix: bump the base image / dependencies and cut a new release; close the issue.
 
 on:
   schedule:
@@ -13,6 +14,7 @@ on:
 permissions:
   contents: read
   packages: read
+  issues: write
 
 jobs:
   trivy:
@@ -29,7 +31,9 @@ jobs:
         run: echo "image=ghcr.io/${GITHUB_REPOSITORY,,}:latest" >> "$GITHUB_OUTPUT"
       # Pinned to a commit (v0.36.0): the action's version tags were force-pushed to
       # malware in March 2026 (CVE-2026-33634).
-      - uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+      - id: scan
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        continue-on-error: true
         with:
           scan-type: image
           image-ref: ${{ steps.ref.outputs.image }}
@@ -37,3 +41,33 @@ jobs:
           ignore-unfixed: true
           exit-code: '1'
           format: table
+          output: trivy-report.txt
+      - name: Report
+        run: cat trivy-report.txt
+      - name: Open or update the issue
+        if: steps.scan.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          IMAGE: ${{ steps.ref.outputs.image }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh label create image-scan --force --color D93F0B \
+            --description 'Trivy found fixable HIGH/CRITICAL vulnerabilities in the published image'
+          {
+            printf 'Trivy found fixable HIGH/CRITICAL vulnerabilities in `%s` ([run](%s)).\n\n' "$IMAGE" "$RUN_URL"
+            printf 'Fix: bump the base image or the affected dependencies and cut a new release, then close this issue. Unfixed findings are not reported.\n\n'
+            printf '```\n'; head -c 60000 trivy-report.txt; printf '\n```\n'
+          } > issue-body.md
+          open=$(gh issue list --label image-scan --state open --json number --jq '.[0].number')
+          if [ -n "$open" ]; then
+            gh issue comment "$open" --body-file issue-body.md
+          else
+            gh issue create --title "Image scan: fixable HIGH/CRITICAL findings in :latest" \
+              --label image-scan --body-file issue-body.md
+          fi
+      - name: Fail on findings
+        if: steps.scan.outcome == 'failure'
+        run: |
+          echo "::error::Trivy found fixable HIGH/CRITICAL vulnerabilities; see the issue labelled image-scan"
+          exit 1
