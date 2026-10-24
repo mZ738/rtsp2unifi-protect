@@ -49,7 +49,7 @@ Requirements: **Node.js 24+**, one free IP address per virtual camera on the NVR
 ```bash
 git clone https://github.com/mZ738/rtsp2unifi-protect.git
 cd rtsp2unifi-protect
-git checkout v2.2.0             # a release tag; main is the development branch
+git checkout v2.2.1             # a release tag; main is the development branch
 npm ci --omit=dev
 npm run vendor-schemas          # store the Onvif schemas locally (needs internet once)
 

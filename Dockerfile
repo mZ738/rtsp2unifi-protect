@@ -22,6 +22,12 @@ RUN node scripts/vendor-schemas.js /app/wsdl/vendor
 FROM node:24-alpine AS runtime
 WORKDIR /app
 
+# The image runs `node main.js` with dependencies copied from the build stage; the
+# npm/yarn toolchain that ships with the base image is dead weight at runtime and
+# its bundled packages show up in vulnerability scans (see CHANGELOG 2.2.1).
+RUN rm -rf /usr/local/lib/node_modules /usr/local/bin/npm /usr/local/bin/npx \
+           /usr/local/bin/corepack /usr/local/bin/yarn /usr/local/bin/yarnpkg /opt/yarn-v*
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY package.json main.js ./
 COPY src ./src
