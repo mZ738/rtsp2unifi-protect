@@ -1,7 +1,9 @@
 name: Release
 
 # Runs when a version tag is pushed (`npm version minor && git push --follow-tags`):
-# tests, then the image to ghcr.io, then a GitHub release with generated notes.
+# tests, then the image to ghcr.io, then a vulnerability scan of the pushed image
+# (the release is only created when no fixable HIGH/CRITICAL finding remains),
+# then a GitHub release with generated notes and the CycloneDX SBOM as an asset.
 
 on:
   push:
@@ -59,17 +61,61 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  release:
+  scan:
+    # Trivy against the image that was just pushed. The action is pinned to a commit
+    # (v0.36.0) because its version tags were force-pushed to malware in March 2026
+    # (CVE-2026-33634); a mutable tag is not a safe reference for this action.
     needs: image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: ref
+        run: echo "image=ghcr.io/${{ github.repository }}:${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+      - name: Vulnerabilities (fails on fixable HIGH/CRITICAL)
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: ${{ steps.ref.outputs.image }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
+          format: table
+      - name: SBOM (CycloneDX)
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: ${{ steps.ref.outputs.image }}
+          format: cyclonedx
+          output: rtsp2unifi-protect-${{ github.ref_name }}.sbom.cdx.json
+          skip-setup-trivy: true
+      - uses: actions/upload-artifact@v7
+        with:
+          name: sbom
+          path: rtsp2unifi-protect-${{ github.ref_name }}.sbom.cdx.json
+          if-no-files-found: error
+
+  release:
+    needs: scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: sbom
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           flags=""
           case "$GITHUB_REF_NAME" in *-*) flags="--prerelease" ;; esac
+          sbom="rtsp2unifi-protect-$GITHUB_REF_NAME.sbom.cdx.json"
           gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes --title "$GITHUB_REF_NAME" $flags \
-            --notes-start-tag "$(git tag --sort=-v:refname | grep -v "^$GITHUB_REF_NAME$" | head -1)" || \
-          gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes --title "$GITHUB_REF_NAME" $flags
+            --notes-start-tag "$(git tag --sort=-v:refname | grep -v "^$GITHUB_REF_NAME$" | head -1)" "$sbom" || \
+          gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes --title "$GITHUB_REF_NAME" $flags "$sbom"
