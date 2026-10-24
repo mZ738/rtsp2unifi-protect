@@ -77,7 +77,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - id: ref
-        run: echo "image=ghcr.io/${{ github.repository }}:${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+        # OCI references must be lowercase; github.repository keeps the owner's casing
+        # (mZ738). docker/metadata-action lowercases for the push, Trivy does not.
+        run: echo "image=ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
       - name: Vulnerabilities (fails on fixable HIGH/CRITICAL)
         uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
         with:
