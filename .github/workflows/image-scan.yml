@@ -32,7 +32,7 @@ jobs:
       # Pinned to a commit (v0.36.0): the action's version tags were force-pushed to
       # malware in March 2026 (CVE-2026-33634).
       - id: scan
-        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         continue-on-error: true
         with:
           scan-type: image
