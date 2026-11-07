@@ -2,6 +2,12 @@
 
 Versions follow [Semantic Versioning](https://semver.org/). Releases are cut with `npm version <major|minor|patch>` and `git push --follow-tags`; the [Release workflow](.github/workflows/release.yml) then runs the tests, publishes the image to `ghcr.io/mz738/rtsp2unifi-protect` and creates the GitHub release.
 
+## [Unreleased]
+
+### Security
+
+- `follow-redirects` 1.16.2 (CVE-2026-116689, GHSA-mrwp-f3q8-3g9p): custom credential headers could follow cross-origin redirects. It is a transitive dependency of `soap` and `axios`.
+
 ## [2.2.1] - 2026-10-24
 
 ### Security
